@@ -10,10 +10,8 @@
     "url": "https://github.com/xg-wang/webstorage-mutex.git"
   },
   "files": [
-    "src",
     "dist",
-    "!dist/**/*.d.ts.map",
-    "docs"
+    "!dist/**/*.d.ts.map"
   ],
   "type": "module",
   "main": "./dist/bundle.cjs.js",

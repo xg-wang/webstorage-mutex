@@ -3,4 +3,4 @@
  * @packageDocumentation
  */
 
-export { mutex, MutexOptions } from './fast-mutex';
+export { mutex, MutexOptions } from './mutex';

@@ -122,7 +122,9 @@ export function mutex<R>(
         } else {
           debug(() => `[${id}] set Z`);
           set(lockZ, '1');
-          return handleCriticalSection();
+          // Sync write to localLStorage might not be updated to other tabs.
+          // Wait a macro task can ensure the the order.
+          return delay(1).then(() => handleCriticalSection());
         }
       })
       .catch((e) => {
@@ -135,22 +137,6 @@ export function mutex<R>(
   };
 
   return start();
-}
-
-function get(key: string): string | null {
-  return window.localStorage.getItem(key);
-}
-
-function set(key: string, value: string): void {
-  window.localStorage.setItem(key, value);
-}
-
-function setFree(key: string): void {
-  window.localStorage.removeItem(key);
-}
-
-function generateRandomID(): string {
-  return `${String(Date.now())}|${Math.round(Math.random() * 1e5)}`;
 }
 
 function repeatUntil(
@@ -175,6 +161,22 @@ function repeatUntil(
 
 function delay(delay: number): Promise<void> {
   return new Promise((res) => setTimeout(res, delay));
+}
+
+function get(key: string): string | null {
+  return window.localStorage.getItem(key);
+}
+
+function set(key: string, value: string): void {
+  window.localStorage.setItem(key, value);
+}
+
+function setFree(key: string): void {
+  window.localStorage.removeItem(key);
+}
+
+function generateRandomID(): string {
+  return `${String(Date.now())}|${Math.round(Math.random() * 1e5)}`;
 }
 
 function debug(data: () => string): void {

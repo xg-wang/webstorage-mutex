@@ -5,6 +5,9 @@ export function log(message: string, ...rest: unknown[]): void {
 }
 
 export function debugPageLogs(page: Page): void {
+  if (!process.env.DEBUG) {
+    return;
+  }
   page.on('console', async (msg) => {
     const msgs = [];
     for (let i = 0; i < msg.args().length; ++i) {

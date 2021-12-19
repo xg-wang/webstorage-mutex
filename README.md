@@ -14,7 +14,9 @@ npm install webstorage-mutex
 ## Example
 
 ```javascript
-const value = await mutex(
+import { mutex } from 'webstorage-mutex';
+
+mutex(
   () => {
     let v = window.localStorage.getItem('test-item');
     if (!v) {
@@ -31,12 +33,15 @@ const value = await mutex(
     repeatTimeout: 1000, // <- this should be the upper bound of your critical section
     delayTime: 50, // <- this is assumed to be long enough for any tab to complete localStorage getItem and setItem
   }
-).catch((reason) => {
-  if (reason.message === 'mutex timeout') {
-    // handle scenario where critical section executes too long
-  }
-});
-console.log(value);
+)
+  .then((value) => {
+    console.log(value);
+  })
+  .catch((reason) => {
+    if (reason.message === 'mutex timeout') {
+      // handle scenario where critical section executes too long
+    }
+  });
 ```
 
 ## Reference

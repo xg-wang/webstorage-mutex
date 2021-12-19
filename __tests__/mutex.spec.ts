@@ -4,7 +4,7 @@ import createTestServer from 'create-test-server';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { BrowserType, chromium, Page } from 'playwright';
+import { BrowserType, Page } from 'playwright';
 import { removeFolders } from 'playwright-core/lib/utils/utils';
 
 import type { mutex } from '../src/';
@@ -41,7 +41,18 @@ type TestFixtures = {
   ) => Promise<{ context: BrowserContext; page: Page }>;
 };
 
-const test = baseTest.extend<TestFixtures>({
+type WorkerFixtures = {
+  browserType: BrowserType;
+};
+
+const test = baseTest.extend<TestFixtures, WorkerFixtures>({
+  browserType: [
+    async ({ _browserType }: any, run) => {
+      await run(_browserType);
+    },
+    { scope: 'worker' },
+  ],
+
   createUserDataDir: async ({}, run) => {
     const dirs: string[] = [];
     await run(async () => {
@@ -54,15 +65,18 @@ const test = baseTest.extend<TestFixtures>({
     await removeFolders(dirs);
   },
 
-  launchPersistent: async ({ createUserDataDir }, run) => {
+  launchPersistent: async ({ createUserDataDir, browserType }, run) => {
     let persistentContext: BrowserContext | undefined;
     await run(async (options) => {
       if (persistentContext)
         throw new Error('can only launch one persistent context');
       const userDataDir = await createUserDataDir();
-      persistentContext = await chromium.launchPersistentContext(userDataDir, {
-        ...options,
-      });
+      persistentContext = await browserType.launchPersistentContext(
+        userDataDir,
+        {
+          ...options,
+        }
+      );
       const page = persistentContext.pages()[0];
       return { context: persistentContext, page };
     });
@@ -70,7 +84,7 @@ const test = baseTest.extend<TestFixtures>({
   },
 });
 
-test.describe('mutex', () => {
+test.describe.parallel('mutex', () => {
   let server: any;
 
   test.beforeEach(async ({ page }) => {

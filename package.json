@@ -1,6 +1,6 @@
 {
   "name": "webstorage-mutex",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Fast mutual exclusion for safe cross tab Web Storage access",
   "license": "MIT",
   "author": "Thomas Wang <hi@xgwang.me>",

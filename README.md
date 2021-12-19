@@ -1,5 +1,7 @@
 # webstorage-mutex 🔒
 
+[![npm version](https://badge.fury.io/js/webstorage-mutex.svg)](https://badge.fury.io/js/webstorage-mutex)
+
 Fast mutual exclusion for safe cross tab Web Storage access
 
 ## Installation
